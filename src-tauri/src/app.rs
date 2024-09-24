@@ -1,6 +1,9 @@
 
 
-use crate::tray::create_tray;
+use once_cell::sync::OnceCell;
+use tauri::AppHandle;
+
+use crate::init::current_setup;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -8,26 +11,30 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+pub static APP_HANDLE: OnceCell<AppHandle> = OnceCell::new();
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default()
-    .plugin(tauri_plugin_shell::init())
-    .setup(|app| {
-        #[cfg(all(desktop))]
-        {
-            let handle = app.handle();
-            create_tray(handle)?;
-        }
-        Ok(())
-    })
-    .invoke_handler(tauri::generate_handler![greet]);
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .setup(|app| {
+            APP_HANDLE.get_or_init(|| app.handle().clone());
+
+
+            #[cfg(all(desktop))]
+            tauri::async_runtime::block_on(async move {
+                current_setup(app).await;
+            });
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![greet]);
 
     #[cfg(debug_assertions)]
     {
         let devtools = tauri_plugin_devtools::init();
         builder = builder.plugin(devtools);
     }
-
 
     let app = builder
         .build(tauri::generate_context!())

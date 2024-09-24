@@ -1,11 +1,14 @@
 use tauri::{
-    menu::{Menu, MenuEvent, MenuItem, PredefinedMenuItem}, tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}, AppHandle, Wry
+    menu::{Menu, MenuEvent, MenuItem, PredefinedMenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    AppHandle, Wry,
 };
 
-use crate::window::create_main_window;
+use crate::{app::APP_HANDLE, window::create_main_window};
 
+pub fn create_tray() -> tauri::Result<()> {
+    let app = APP_HANDLE.get().unwrap();
 
-pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
     let menu = create_menu(app)?;
 
     let _ = TrayIconBuilder::with_id("tray")
@@ -13,40 +16,36 @@ pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
         .menu(&menu)
         .menu_on_left_click(false)
         .on_menu_event(handle_nemu_event)
-        .on_tray_icon_event(|tray, event| {
-
+        .on_tray_icon_event(|_, event| {
             if let TrayIconEvent::Click {
                 button: MouseButton::Left,
                 button_state: MouseButtonState::Up,
                 ..
-            } = event {
-                let app = tray.app_handle();
-                create_main_window(app);
+            } = event
+            {
+                create_main_window();
             }
-
         })
         .build(app);
 
     Ok(())
 }
 
-
 pub fn create_menu(app: &AppHandle) -> tauri::Result<tauri::menu::Menu<Wry>> {
-
     let quit_app = &MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let divid_menu_item = &PredefinedMenuItem::separator(app).unwrap();
 
-
-    let menu = Menu::with_items(app, &[
-        &MenuItem::with_id(app, "setting", "Setting", true, None::<&str>)?,
-        divid_menu_item,
-        quit_app,
-    ])?;
-
+    let menu = Menu::with_items(
+        app,
+        &[
+            &MenuItem::with_id(app, "setting", "Setting", true, None::<&str>)?,
+            divid_menu_item,
+            quit_app,
+        ],
+    )?;
 
     Ok(menu)
 }
-
 
 pub fn handle_nemu_event(app: &AppHandle, event: MenuEvent) {
     match event.id.as_ref() {

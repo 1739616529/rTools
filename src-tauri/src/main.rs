@@ -10,10 +10,8 @@ mod window;
 
 #[cfg(desktop)]
 mod tray;
-
-
-
-
+mod hotkey;
+mod init;
 
 fn main() {
     app::run();
