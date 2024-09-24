@@ -12,7 +12,7 @@ pub fn create_main_window(app_handle: &AppHandle) {
         app_handle,
         "main",
         tauri::WebviewUrl::App("index.html".into())
-    ).visible(false).decorations(false).skip_taskbar(false).focused(true);
+    ).visible(false).decorations(false).skip_taskbar(false).inner_size(0.0, 0.0);
 
     _ = builder.build().unwrap();
 
