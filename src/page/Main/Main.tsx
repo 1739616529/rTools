@@ -1,29 +1,40 @@
 import { useSearchStore, useStore } from "@/store";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { LogicalPosition, LogicalSize } from '@tauri-apps/api/window';
-import { format_ww_size_mode, listener_el_resize } from "@/lib/window"
 import { ChangeEvent, DetailedHTMLProps, FormEventHandler, InputHTMLAttributes, useEffect, useState } from "react";
+import {dispatch_event} from "@/util";
 
 const current_window = getCurrentWebviewWindow()
-current_window.hide()
 
+const set_window_focus = async function () {
+    const is_focus = await current_window.isFocused()
+    if (is_focus) return
+    await current_window.setFocus()
+}
 
+set_window_focus()
 export function Component() {
     useEffect(() => {
         const { clientHeight, clientWidth } = document.getElementById("main-window")!
         const { availHeight, availWidth } = screen
         current_window.setAlwaysOnTop(true)
-        current_window.setFocus()
-
         current_window.setSize(new LogicalSize(availWidth / 3, clientHeight))
         current_window.setPosition( new LogicalPosition(availWidth / 3, availHeight / 4) )
-
         current_window.show()
+
+        const dispatch_focus = dispatch_event(() => {
+            return current_window.close()
+        }, 30)
+        addEventListener("blur", dispatch_focus.exec)
+        addEventListener("focus", dispatch_focus.cancel)
+        return () => {
+            removeEventListener("blur", dispatch_focus.exec)
+            removeEventListener("focus", dispatch_focus.cancel)
+        }
     }, [])
 
 
     const search_store = useSearchStore()
-    const [focus, set_focus] = useState(document.hasFocus())
 
 
 
@@ -41,8 +52,6 @@ export function Component() {
                 }}
                 // onBlur={() => current_window.close()}
             />
-            <span>1
-            { focus + "" }</span>
         </div>
     );
 }
