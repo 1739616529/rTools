@@ -6,3 +6,5 @@
 *.exe binary
 *.node binary
 *.webp binary
+*.ico binary
+*.icns binary
