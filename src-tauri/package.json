@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "dev": "cd ../ui && pnpm dev",
+        "build": "cd ../ui && pnpm build"
+    }
+}

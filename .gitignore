@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist.chrome-extends
+dist-ssr
+*.local
+
+# Editor directories and files
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+auto-imports.d.ts
+*.lock
+*lock.json
+types/*.dev.*
+vue3-temp-*.tgz
+target
+/dist\.chrome-extends/
+chrome-extends-api-listen.7z
