@@ -6,12 +6,14 @@
 
 mod app;
 mod window;
+mod hotkey;
+mod init;
+mod plugin;
 
 
 #[cfg(desktop)]
 mod tray;
-mod hotkey;
-mod init;
+
 
 fn main() {
     app::run();
