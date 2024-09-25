@@ -2,17 +2,9 @@ use tauri::{Manager, WebviewWindowBuilder};
 
 use crate::app::APP_HANDLE;
 
-pub fn create_main_window() {
+pub fn main_window_create() {
     let app_handle = APP_HANDLE.get();
     let app_handle = app_handle.unwrap();
-
-    if let Some(window) = app_handle.get_webview_window("main") {
-        let _ = window.close();
-
-        println!("main window already exists");
-        return;
-    }
-
     let builder = WebviewWindowBuilder::new(
         app_handle,
         "main",
@@ -22,7 +14,19 @@ pub fn create_main_window() {
     .decorations(false)
     .skip_taskbar(false)
     .focused(true)
-    .inner_size(0.0, 0.0);
+    .inner_size(0.0, 0.0)
+    .resizable(false)
+    ;
 
     _ = builder.build().unwrap();
+}
+
+pub fn main_window_crate_or_close() {
+    let app_handle = APP_HANDLE.get();
+    let app_handle = app_handle.unwrap();
+    if let Some(window) = app_handle.get_webview_window("main") {
+        let _ = window.close();
+        return;
+    }
+    main_window_create()
 }

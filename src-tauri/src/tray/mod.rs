@@ -4,7 +4,7 @@ use tauri::{
     AppHandle, Wry,
 };
 
-use crate::{app::APP_HANDLE, window::create_main_window};
+use crate::{app::APP_HANDLE, window::main_window_crate_or_close};
 
 pub fn create_tray() -> tauri::Result<()> {
     let app = APP_HANDLE.get().unwrap();
@@ -23,7 +23,7 @@ pub fn create_tray() -> tauri::Result<()> {
                 ..
             } = event
             {
-                create_main_window();
+                main_window_crate_or_close();
             }
         })
         .build(app);
