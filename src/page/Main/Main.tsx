@@ -31,9 +31,12 @@ set_window_focus();
  * @description close window
  * @returns
  */
-const window_close = function () {
-    // return current_window.close();
+const window_close = async function () {
+    if (process.env.NODE_ENV === "production")
+        await current_window.close()
 };
+
+console.log()
 
 export function Component() {
     /**
