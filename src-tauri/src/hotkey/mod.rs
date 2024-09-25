@@ -2,7 +2,7 @@ use anyhow::{bail, Result};
 
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
-use crate::{app::APP_HANDLE, window::create_main_window};
+use crate::{app::APP_HANDLE, window::main_window_crate_or_close};
 
 pub fn registry_hotkey(hotkey: &str, event: &str) -> Result<()> {
     let app_handle = APP_HANDLE.get();
@@ -17,10 +17,7 @@ pub fn registry_hotkey(hotkey: &str, event: &str) -> Result<()> {
     };
 
     let func = match event.trim() {
-        "open_main_window" => || {
-            println!("hotkey open_main_window");
-            create_main_window();
-        },
+        "open_main_window" => main_window_crate_or_close,
         _ => bail!("invalid function \"{event}\""),
     };
 
