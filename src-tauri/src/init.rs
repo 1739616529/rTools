@@ -10,5 +10,5 @@ pub async fn current_setup(app: &mut App) {
     VERSION.get_or_init(|| version.clone());
 
     let _ = create_tray();
-    let _ = registry_hotkey("CTRL+U", "open_main_window");
+    let _ = registry_hotkey("ALT+SPACE", "open_main_window");
 }
