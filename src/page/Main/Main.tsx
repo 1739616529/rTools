@@ -36,19 +36,25 @@ const window_close = async function () {
         await current_window.close()
 };
 
-console.log()
+
+
+/**
+ * @description When the DOM is in focus, there is a very short period of loss of focus when clicking on it. A time delay is given. If the focus is regained within this time, the page will not be closed.
+ */
+const dispatch_focus = dispatch_event(() => {
+    return window_close();
+
+/**
+ * @description Delay time at least 10ms
+ */
+//  this here
+//      |
+//  ┌───┘
+//  ↓
+}, 10);
 
 export function Component() {
-    /**
-     * @description When the DOM is in focus, there is a very short period of loss of focus when clicking on it. A time delay is given. If the focus is regained within this time, the page will not be closed.
-     */
-    const dispatch_focus = dispatch_event(() => {
-        return window_close();
 
-        /**
-         * @description Delay time at least 10ms
-         */
-    }, 10);
     useAddEventListener("blur", dispatch_focus.exec);
     useAddEventListener("focus", dispatch_focus.cancel);
 
