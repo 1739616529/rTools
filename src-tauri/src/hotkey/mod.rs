@@ -17,14 +17,22 @@ pub fn registry_hotkey(hotkey: &str, event: &str) -> Result<()> {
     };
 
     let func = match event.trim() {
+        "open_setting_window" => main_window_crate_or_close,
         "open_main_window" => main_window_crate_or_close,
-        _ => bail!("invalid function \"{event}\""),
+        _ =>  {
+            let event = event.to_string();
+            || {
+                println!("{}", &event)
+            }
+        },
     };
 
-    let _ = manager.on_shortcut(hotkey, move |_, _, event| {
-        if let ShortcutState::Pressed = event.state {
-            func();
+    _ = manager.on_shortcut(hotkey, move |_, _, hotkey_event| {
+        if ShortcutState::Pressed != hotkey_event.state {
+            return;
         }
+
+
     });
 
     Ok(())
