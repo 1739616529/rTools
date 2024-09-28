@@ -1,7 +1,10 @@
 use std::{collections::HashMap, sync::Mutex};
 
+use anyhow::Result;
 use tauri::{plugin::TauriPlugin, AppHandle, Wry};
-use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutEvent};
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, ShortcutState, Shortcut, ShortcutEvent};
+
+use super::window::open_main_window;
 
 
 
@@ -47,10 +50,32 @@ pub struct HotkeysStore {
 
 fn handle(app: &AppHandle, hotkey: &Shortcut, event: ShortcutEvent)  {
 
+    if !matches!(event.state(), ShortcutState::Pressed) {
+        return;
+    }
+
+    if "alt+Space" == hotkey.into_string() {
+        _ = open_main_window(app);
+    }
 
 
 }
 
+
+pub fn registry(app: &AppHandle) -> Result<()> {
+    let global_shortcut = app.global_shortcut();
+
+    let shortcut = HotKey {
+        code: Code::Space,
+        meta: false,
+        ctrl: false,
+        alt: true,
+        shift: false,
+    };
+    global_shortcut.register(shortcut.to_shortcut())?;
+
+    Ok(())
+}
 
 
 pub fn init() -> TauriPlugin<Wry> {

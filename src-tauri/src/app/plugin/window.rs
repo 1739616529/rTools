@@ -1,19 +1,37 @@
 use tauri::{
-    plugin::{Builder, TauriPlugin},
-    AppHandle, Manager, Result, WebviewUrl, WebviewWindow, WebviewWindowBuilder, Wry,
+    ipc::IpcResponse, plugin::{Builder, TauriPlugin}, AppHandle, LogicalPosition, LogicalSize, Manager, PhysicalPosition, PhysicalSize, Position, Result, WebviewUrl, WebviewWindow, WebviewWindowBuilder, Wry
 };
 
 pub const CORE_MAIN_WINDOW: &str = "core:window:main";
 pub const CORE_SETTING_WINDOW: &str = "core:window:setting";
 pub fn open_main_window(app: &AppHandle) -> Result<()> {
+    if app.get_webview_window(CORE_MAIN_WINDOW).is_some() {
+        return  Ok(());;
+    }
     let builder = WebviewWindowBuilder::new(app, CORE_MAIN_WINDOW, WebviewUrl::App("/".into()))
-        .visible(false)
+        .visible(true)
         .decorations(false)
         .skip_taskbar(false)
+        .resizable(false)
+        .transparent(true)
+        .shadow(false)
+        .always_on_top(true)
         .focused(true)
-        .inner_size(800.0, 600.0)
-        .resizable(false);
-    builder.build()?;
+        ;
+    let window = builder.build()?;
+    if let Some(current_monitor) = window.current_monitor()? {
+        let current_monitor_size = &current_monitor.size().to_logical::<f64>(current_monitor.scale_factor());
+        let height = current_monitor_size.height;
+        let width = current_monitor_size.width;
+        window.set_position(Position::Logical(LogicalPosition::new(width / 3.0 ,height / 4.0)))?;
+        window.set_size(LogicalSize::new(width / 3.0 , 56.0))?;
+
+
+
+
+        // #[cfg(debug_assertions)]
+        // window.open_devtools();
+    }
     Ok(())
 }
 pub fn open_setting_window(app: &AppHandle) -> Result<()> {

@@ -1,73 +1,30 @@
 import { useSearchStore } from "@/store";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { LogicalPosition, LogicalSize } from "@tauri-apps/api/window";
 import {
     ChangeEvent,
     DetailedHTMLProps,
     InputHTMLAttributes,
     useEffect,
 } from "react";
-import { dispatch_event } from "@/util";
-import { useAddEventListener } from "src/hook";
-
-/**
- * @description current webview window
- */
-const current_window = getCurrentWebviewWindow();
-
-
-/**
- * @description if window is not focused, set window focus
- * @returns
- */
-const set_window_focus = async function () {
-    const is_focus = await current_window.isFocused();
-    if (is_focus) return;
-    await current_window.setFocus();
-};
-set_window_focus();
-
-/**
- * @description close window
- * @returns
- */
-const window_close = async function () {
-    if (process.env.NODE_ENV === "production")
-        await current_window.close()
-};
+import { useAddEventListener, useBlurCloseWebviewHook } from "src/hook";
+import { webview_close, webview_focus } from "src/util/window";
+import "./main.css";
 
 
 
-/**
- * @description When the DOM is in focus, there is a very short period of loss of focus when clicking on it. A time delay is given. If the focus is regained within this time, the page will not be closed.
- */
-const dispatch_focus = dispatch_event(() => {
-    return window_close();
 
-/**
- * @description Delay time at least 10ms
- */
-//  this here
-//      |
-//  ┌───┘
-//  ↓
-}, 10);
+
 
 export function Component() {
 
-    useAddEventListener("blur", dispatch_focus.exec);
-    useAddEventListener("focus", dispatch_focus.cancel);
-
-    useEffect(() => {
-        current_window.show()
-    }, [])
-
-
+    /**
+     * @description blur close webview
+     */
+    useBlurCloseWebviewHook()
     /**
      * @description Press esc to close the page
      */
     useAddEventListener("keydown", (e: KeyboardEvent) => {
-        if (e.key === "Escape") return window_close();
+        if (e.key === "Escape") return webview_close();
     });
 
 
@@ -77,7 +34,7 @@ export function Component() {
         <div
             id="main-window"
             data-tauri-drag-region
-            className="h-[min-content]"
+            className="h-[min-content] overflow-hidden rounded-lg bg-white dark:bg-black"
 
         >
             <SearchInput
@@ -96,17 +53,20 @@ type SearchInputProps = DetailedHTMLProps<
 
 function SearchInput(prop: SearchInputProps) {
     useEffect(() => {
-        // input focus
-        const el = document.getElementById("search-input") as HTMLInputElement;
-        el?.focus();
+        webview_focus().then(() => {
+            const el = document.getElementById("search-input") as HTMLInputElement;
+            el?.focus();
+        })
+
     }, []);
 
     return (
         <input
             data-tauri-drag-region
             id="search-input"
-            className="w-full outline-none h-14 text-3xl p-2 cursor-pointer"
-            placeholder="Hi, rTools"
+            className="w-full outline-none h-14 text-3xl pl-4 cursor-pointer bg-transparent"
+            placeholder={document.hasFocus() + ""}
+            // placeholder="Hi, rTools"
             type="text"
             {...prop}
         />
