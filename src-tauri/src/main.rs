@@ -1,20 +1,9 @@
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-
-
-
-mod app;
-mod window;
-mod hotkey;
-mod init;
 mod plugin;
+mod app;
 
-
-#[cfg(desktop)]
-mod tray;
 
 
 fn main() {
-    app::run();
+    app::Applican::run();
 }

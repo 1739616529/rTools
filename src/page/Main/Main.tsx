@@ -58,6 +58,10 @@ export function Component() {
     useAddEventListener("blur", dispatch_focus.exec);
     useAddEventListener("focus", dispatch_focus.cancel);
 
+    useEffect(() => {
+        current_window.show()
+    }, [])
+
 
     /**
      * @description Press esc to close the page
@@ -65,25 +69,6 @@ export function Component() {
     useAddEventListener("keydown", (e: KeyboardEvent) => {
         if (e.key === "Escape") return window_close();
     });
-
-
-    useEffect(() => {
-        const { clientHeight, clientWidth } =
-            document.getElementById("main-window")!;
-        const { availHeight, availWidth } = screen;
-        current_window.setAlwaysOnTop(true);
-
-        // width is screen avail width one third, height with #main-window height
-        current_window.setSize(new LogicalSize(availWidth / 3, clientHeight));
-
-        // position is screen avail width one third, height with half of the window
-        current_window.setPosition(
-            new LogicalPosition(availWidth / 3, availHeight / 4)
-        );
-
-        // create window is hidden, change position and size after show window
-        current_window.show();
-    }, []);
 
 
     const search_store = useSearchStore();

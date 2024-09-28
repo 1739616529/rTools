@@ -12,6 +12,10 @@ export const page: RouteObject[] = [
     {
         index: true,
         lazy: () => import("@/page/Main/Main"),
+    },
+    {
+        path: "setting",
+        lazy: () => import("@/page/Setting/Setting")
     }
 ]
 

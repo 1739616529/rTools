@@ -7,7 +7,6 @@ use parking_lot::Mutex;
 use serde::Deserialize;
 use tokio::fs::{read_dir, read_to_string};
 
-use crate::hotkey::registry_hotkey;
 
 
 /// ##### plugin start state
@@ -147,7 +146,7 @@ pub struct PluginShortcut {
 
 impl PluginShortcut {
     pub fn registry (&self) -> Result<()>{
-        registry_hotkey(&self.hotkey, &self.command)?;
+        // registry_hotkey(&self.hotkey, &self.command)?;
         Ok(())
     }
 }
