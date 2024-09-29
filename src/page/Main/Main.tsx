@@ -4,6 +4,8 @@ import {
     DetailedHTMLProps,
     InputHTMLAttributes,
     useEffect,
+    useRef,
+    useState,
 } from "react";
 import { useAddEventListener, useBlurCloseWebviewHook } from "src/hook";
 import { webview_close, webview_focus } from "src/util/window";
@@ -34,7 +36,7 @@ export function Component() {
         <div
             id="main-window"
             data-tauri-drag-region
-            className="h-[min-content] overflow-hidden rounded-lg bg-white dark:bg-black"
+            className="h-[max-content] overflow-hidden rounded-lg bg-white dark:bg-black"
 
         >
             <SearchInput
@@ -52,7 +54,12 @@ type SearchInputProps = DetailedHTMLProps<
 > & {};
 
 function SearchInput(prop: SearchInputProps) {
+    const [focused, set_focused] = useState(document.hasFocus())
+
+    useAddEventListener("focus", () => set_focused(() => true))
+    useAddEventListener("blur", () => set_focused(() => false))
     useEffect(() => {
+
         webview_focus().then(() => {
             const el = document.getElementById("search-input") as HTMLInputElement;
             el?.focus();
@@ -61,15 +68,17 @@ function SearchInput(prop: SearchInputProps) {
     }, []);
 
     return (
-        <input
-            data-tauri-drag-region
-            id="search-input"
-            className="w-full outline-none h-14 text-3xl pl-4 cursor-pointer bg-transparent"
-            placeholder={document.hasFocus() + ""}
-            // placeholder="Hi, rTools"
-            type="text"
-            {...prop}
-        />
+        <div className="h-[max-content]">
+            <input
+                data-tauri-drag-region
+                id="search-input"
+                className="w-full outline-none h-14 text-3xl pl-4 cursor-pointer bg-transparent placeholder:translate-x-1"
+                placeholder={focused.toString()}
+                // placeholder="Hi, rTools"
+                type="text"
+                {...prop}
+            />
+        </div>
     );
 }
 
