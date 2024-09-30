@@ -1,8 +1,9 @@
-use std::{collections::HashMap, sync::Mutex};
+// use std::{collections::HashMap, sync::Mutex};
 
 use anyhow::Result;
 use tauri::{plugin::TauriPlugin, AppHandle, Wry};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, ShortcutState, Shortcut, ShortcutEvent};
+
 
 use super::window::open_main_window;
 
@@ -41,11 +42,11 @@ impl HotKey {
 
 
 
-pub type HotkeysState = Mutex<HotkeysStore>;
+// pub type HotkeysState = Mutex<HotkeysStore>;
 
-pub struct HotkeysStore {
-    hotkeys: HashMap<String, HotKey>,
-}
+// pub struct HotkeysStore {
+//     hotkeys: HashMap<String, HotKey>,
+// }
 
 
 fn handle(app: &AppHandle, hotkey: &Shortcut, event: ShortcutEvent)  {
@@ -53,8 +54,8 @@ fn handle(app: &AppHandle, hotkey: &Shortcut, event: ShortcutEvent)  {
     if !matches!(event.state(), ShortcutState::Pressed) {
         return;
     }
-
     if "alt+Space" == hotkey.into_string() {
+        println!("alt+Space");
         _ = open_main_window(app);
     }
 

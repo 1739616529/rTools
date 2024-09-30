@@ -1,6 +1,6 @@
-use tauri::{menu::{Menu, MenuEvent, MenuItem, PredefinedMenuItem}, plugin::{Builder, TauriPlugin}, tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}, AppHandle, Manager, Wry};
+use tauri::{menu::{Menu, MenuEvent, MenuItem, PredefinedMenuItem}, plugin::{Builder, TauriPlugin}, tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}, AppHandle, RunEvent, WindowEvent, Wry};
 
-use super::window::{open_main_window, open_setting_window, CORE_MAIN_WINDOW};
+use super::window::{open_main_window, open_setting_window};
 
 
 
@@ -38,11 +38,7 @@ fn build_tray(app: &AppHandle)  -> tauri::Result<()> {
             } = event
             {
                 let app_handle =  app.app_handle();
-                match app_handle.get_webview_window(CORE_MAIN_WINDOW) {
-                    Some(window) => {_ = window.close();},
-                    None => {_ = open_main_window(app_handle);},
-                };
-
+                _ = open_main_window(app_handle);
             }
         })
         .build(app);
@@ -56,7 +52,7 @@ fn handle_nemu_event(app: &AppHandle, event: MenuEvent) {
     match event.id.as_ref() {
         "quit" => {
             app.exit(0);
-            std::process::exit(0);
+            println!("exit");
         }
         "setting" => {
             _ = open_setting_window(app);
@@ -72,9 +68,17 @@ fn handle_nemu_event(app: &AppHandle, event: MenuEvent) {
 
 pub fn init() -> TauriPlugin<Wry> {
     Builder::new("core.tray")
-        .setup(|app, event| {
+        .setup(|app, _| {
             build_tray(app)?;
             Ok(())
+        })
+        .on_event(|_, e| match e {
+            tauri::RunEvent::ExitRequested { api, code , .. } => {
+                if code.is_none() {
+                    api.prevent_exit();
+                }
+            }
+            _ => {}
         })
     .build()
 }
