@@ -35,7 +35,6 @@ export function Component() {
     return (
         <div
             id="main-window"
-            data-tauri-drag-region
             className="h-[max-content] overflow-hidden rounded-lg bg-white dark:bg-black"
 
         >
@@ -67,12 +66,13 @@ function SearchInput(prop: SearchInputProps) {
 
     }, []);
 
+
     return (
         <div className="h-[max-content]">
             <input
                 data-tauri-drag-region
                 id="search-input"
-                className="w-full outline-none h-14 text-3xl pl-4 cursor-pointer bg-transparent placeholder:translate-x-1"
+                className="w-full outline-none h-14 text-3xl cursor-default pl-4 bg-transparent placeholder:translate-x-1"
                 placeholder={focused.toString()}
                 // placeholder="Hi, rTools"
                 type="text"
