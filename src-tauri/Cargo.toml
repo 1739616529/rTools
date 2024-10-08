@@ -8,24 +8,26 @@ edition = "2021"
 
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-rc", features = [] }
+tauri-build = { version = "2.0.0", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0-rc", features = [
+tauri = { version = "2.0.0", features = [
     "devtools",
     "tray-icon",
     "image-ico",
     "image-png",
 ] }
-tauri-plugin-shell = "2.0.0-rc"
+tauri-plugin-shell = "2.0.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tauri-plugin-devtools = "2.0.0-rc"
+tauri-plugin-devtools = "2.0.0"
 once_cell = "1.19"
 anyhow = "1.0"
 parking_lot = "0.12"
 tokio = { version = "1.40.0", features = ["full"] }
 libloading = "0.8"
+tauri-plugin-log = "2"
+log = "0.4.22"
 
 
 [target.'cfg(windows)'.dependencies]
@@ -37,9 +39,10 @@ winreg = "0.52.0"
 users = "0.11.0"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
-tauri-plugin-autostart = "2.0.0-rc.1"
-tauri-plugin-single-instance = "2.0.0-rc.4"
-tauri-plugin-global-shortcut = "2.0.0-rc"
-tauri-plugin-updater = "2.0.0-rc"
-tauri-plugin-window-state = "2.0.0-rc.4"
+tauri-plugin-autostart = "2.0.0"
+tauri-plugin-single-instance = "2.0.0"
+tauri-plugin-global-shortcut = "2.0.0"
+tauri-plugin-updater = "2.0.0"
+tauri-plugin-window-state = "2.0.0"
 #openssl
+

@@ -7,7 +7,7 @@ use std::{
 use anyhow::Error;
 use serde::{Deserialize, Serialize};
 use tauri::{
-    plugin::{Builder, TauriPlugin}, webview::PageLoadEvent, AppHandle, LogicalPosition, LogicalSize, Manager, PhysicalPosition, PhysicalSize, Result, RunEvent, Runtime, WebviewUrl, WebviewWindow, WebviewWindowBuilder, Window, WindowEvent, Wry
+    plugin::{Builder, TauriPlugin}, AppHandle, LogicalPosition, LogicalSize, Manager, Result, RunEvent, Runtime, WebviewUrl, WebviewWindow, WebviewWindowBuilder, Window, WindowEvent, Wry
 };
 
 pub const CORE_MAIN_WINDOW: &str = "core:window:main";
@@ -209,7 +209,6 @@ impl<R: Runtime> WindowExt for Window<R> {
         let pos = self.outer_position()?;
         let size = self.inner_size()?;
 
-        println!("{:?}", size);
         state.x = pos.x as f64;
         state.y = pos.y as f64;
         state.width = size.width;

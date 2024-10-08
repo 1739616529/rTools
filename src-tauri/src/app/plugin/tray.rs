@@ -1,4 +1,4 @@
-use tauri::{menu::{Menu, MenuEvent, MenuItem, PredefinedMenuItem}, plugin::{Builder, TauriPlugin}, tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}, AppHandle, RunEvent, WindowEvent, Wry};
+use tauri::{menu::{Menu, MenuEvent, MenuItem, PredefinedMenuItem}, plugin::{Builder, TauriPlugin}, tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}, AppHandle, Wry};
 
 use super::window::{open_main_window, open_setting_window};
 

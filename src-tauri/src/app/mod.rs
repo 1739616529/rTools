@@ -1,7 +1,6 @@
-
-
 mod plugin;
 mod setup;
+
 
 use tauri::{generate_context, Builder};
 use tauri_plugin_autostart::MacosLauncher;
@@ -17,7 +16,7 @@ impl Applican {
 
         let context = generate_context!();
 
-        let mut builder = Builder::default()
+        let builder = Builder::default()
             .plugin(tauri_plugin_single_instance::init(|_, _, _| {}))
             .setup(setup::init)
             // 托盘
@@ -29,22 +28,15 @@ impl Applican {
                 MacosLauncher::LaunchAgent,
                 Some(vec![AUTO_LAUNCH_ARG]),
             ))
+            .plugin(tauri_plugin_log::Builder::new().level(log::LevelFilter::Info).build())
             // 窗口
             .plugin(plugin::window::init())
-            // 日志信息
-
             // .manage(state)
             ;
 
 
-
-        #[cfg(debug_assertions)]
-        {
-            let devtools = tauri_plugin_devtools::init(); // initialize the plugin as early as possible
-            builder = builder.plugin(devtools);
-        }
-
-        let app = builder.build(context)
+        let app = builder
+            .build(context)
             .expect("error while running tauri application");
         app.run(|_app, event| match event {
             _ => {}
