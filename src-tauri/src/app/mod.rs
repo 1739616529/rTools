@@ -5,7 +5,6 @@ mod setup;
 
 use tauri::{generate_context, Builder};
 use tauri_plugin_autostart::MacosLauncher;
-// use tauri_plugin_log::{Target, TargetKind};
 
 pub const AUTO_LAUNCH_ARG: &str = "--auto-launch";
 
@@ -33,10 +32,7 @@ impl Applican {
             // 窗口
             .plugin(plugin::window::init())
             // 日志信息
-            .plugin(
-                tauri_plugin_log::Builder::new()
-                    .build(),
-            )
+
             // .manage(state)
             ;
 
