@@ -8,20 +8,14 @@ import {
     useState,
 } from "react";
 import { useAddEventListener, useBlurCloseWebviewHook } from "src/hook";
-import { webview_close, webview_focus } from "src/util/window";
+import { webview_close } from "src/util/window";
 import "./main.css";
 
-
-
-
-
-
 export function Component() {
-
     /**
      * @description blur close webview
      */
-    useBlurCloseWebviewHook()
+    useBlurCloseWebviewHook();
     /**
      * @description Press esc to close the page
      */
@@ -29,14 +23,12 @@ export function Component() {
         if (e.key === "Escape") return webview_close();
     });
 
-
     const search_store = useSearchStore();
 
     return (
         <div
             id="main-window"
             className="h-[max-content] overflow-hidden rounded-lg bg-white dark:bg-black"
-
         >
             <SearchInput
                 onInput={(e: ChangeEvent<HTMLInputElement>) => {
@@ -53,19 +45,14 @@ type SearchInputProps = DetailedHTMLProps<
 > & {};
 
 function SearchInput(prop: SearchInputProps) {
-    const [focused, set_focused] = useState(document.hasFocus())
+    const [focused, set_focused] = useState(document.hasFocus());
 
-    useAddEventListener("focus", () => set_focused(() => true))
-    useAddEventListener("blur", () => set_focused(() => false))
+    useAddEventListener("focus", () => set_focused(() => true));
+    useAddEventListener("blur", () => set_focused(() => false));
     useEffect(() => {
-
-        webview_focus().then(() => {
-            const el = document.getElementById("search-input") as HTMLInputElement;
-            el?.focus();
-        })
-
+        const el = document.getElementById("search-input") as HTMLInputElement;
+        el?.focus();
     }, []);
-
 
     return (
         <div className="h-[max-content]">

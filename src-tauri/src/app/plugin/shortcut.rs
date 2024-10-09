@@ -1,8 +1,10 @@
-// use std::{collections::HashMap, sync::Mutex};
+
+
 
 use anyhow::Result;
 use tauri::{plugin::TauriPlugin, AppHandle, Wry};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, ShortcutState, Shortcut, ShortcutEvent};
+
 
 
 use super::window::open_main_window;
@@ -56,7 +58,14 @@ fn handle(app: &AppHandle, hotkey: &Shortcut, event: ShortcutEvent)  {
     }
     if "alt+Space" == hotkey.into_string() {
         println!("alt+Space");
-        _ = open_main_window(app);
+
+
+        let a = app.clone();
+        tauri::async_runtime::spawn(async move {
+            _ = open_main_window(&a);
+        });
+
+
     }
 
 
