@@ -1,92 +1,59 @@
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
 
-
-
-use anyhow::Result;
-use tauri::{plugin::TauriPlugin, AppHandle, Wry};
-use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, ShortcutState, Shortcut, ShortcutEvent};
-
-
+use anyhow::{Error, Result};
+use tauri::{plugin::TauriPlugin, AppHandle, Manager, Wry};
+use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutEvent, ShortcutState};
 
 use super::window::open_main_window;
 
+struct ShortcutStateCache(Arc<Mutex<HashMap<String, String>>>);
 
-
-pub struct HotKey {
-    code: Code,
-    meta: bool,
-    ctrl: bool,
-    alt: bool,
-    shift: bool,
-}
-
-impl HotKey {
-    pub fn to_shortcut(&self) -> Shortcut{
-        let mut modifiers = Modifiers::empty();
-
-        if self.meta {
-            modifiers |= Modifiers::META;
-        }
-        if self.ctrl {
-            modifiers |= Modifiers::CONTROL;
-        }
-        if self.alt {
-            modifiers |= Modifiers::ALT;
-        }
-        if self.shift {
-            modifiers |= Modifiers::SHIFT;
-        }
-
-        Shortcut::new(Some(modifiers), self.code)
-    }
-}
-
-
-
-
-
-// pub type HotkeysState = Mutex<HotkeysStore>;
-
-// pub struct HotkeysStore {
-//     hotkeys: HashMap<String, HotKey>,
-// }
-
-
-fn handle(app: &AppHandle, hotkey: &Shortcut, event: ShortcutEvent)  {
-
-    if !matches!(event.state(), ShortcutState::Pressed) {
+fn handle(app: &AppHandle, hotkey: &Shortcut, e: ShortcutEvent) {
+    if !matches!(e.state(), ShortcutState::Pressed) {
         return;
     }
-    if "alt+Space" == hotkey.into_string() {
-        println!("alt+Space");
+    let binding = app.state::<ShortcutStateCache>().0.clone();
+    let global_state = binding.lock().unwrap();
 
+    let event = global_state.get(&hotkey.into_string());
 
-        let a = app.clone();
-        tauri::async_runtime::spawn(async move {
-            _ = open_main_window(&a);
-        });
-
-
+    if event.is_none() {
+        return;
     }
 
-
+    let event = event.unwrap().as_str();
+    match event {
+        "core:open.main.window" => {
+            let a = app.clone();
+            tauri::async_runtime::spawn(async move {
+                _ = open_main_window(&a);
+            });
+        }
+        _ => {
+            println!("{event}")
+        }
+    }
 }
 
-
-pub fn registry(app: &AppHandle) -> Result<()> {
+pub fn registry(app: &AppHandle, shortcut: String, event: String) -> Result<()> {
     let global_shortcut = app.global_shortcut();
+    let binding = app.state::<ShortcutStateCache>().0.clone();
+    let mut global_state = binding.lock().unwrap();
+    let _shortcut = shortcut.as_str();
+    // 如果快捷键存在 抛出错误
+    if global_shortcut.is_registered(_shortcut) {
+        return Err(Error::msg("message"));
+    }
 
-    let shortcut = HotKey {
-        code: Code::Space,
-        meta: false,
-        ctrl: false,
-        alt: true,
-        shift: false,
-    };
-    global_shortcut.register(shortcut.to_shortcut())?;
+    global_state.insert(shortcut.clone(), event);
+
+    global_shortcut.register(_shortcut)?;
 
     Ok(())
 }
-
 
 pub fn init() -> TauriPlugin<Wry> {
     tauri_plugin_global_shortcut::Builder::new()
