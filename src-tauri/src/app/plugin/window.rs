@@ -16,7 +16,6 @@ pub const DEFAULT_FILENAME: &str = ".window-state.json";
 pub fn open_main_window(app: &AppHandle) -> Result<()> {
     if let Some(window) = app.get_webview_window(CORE_MAIN_WINDOW) {
         window.close()?;
-        println!("main exist");
         return Ok(());
     }
     let builder = WebviewWindowBuilder::new(app, CORE_MAIN_WINDOW, WebviewUrl::App("/".into()))
@@ -157,7 +156,7 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
 
 impl<R: Runtime> WindowExt for Window<R> {
     fn restore_state(&self) -> tauri::Result<()> {
-        let cache = self.app_handle().state::<WindowStateCache>();
+        let cache: tauri::State<'_, WindowStateCache> = self.state::<WindowStateCache>();
         let cache = cache.0.clone();
         let binding = cache.lock().unwrap();
         let state = binding.get(self.label());
@@ -199,7 +198,7 @@ impl<R: Runtime> WindowExt for Window<R> {
         Ok(())
     }
     fn set_state(&self) -> tauri::Result<()> {
-        let cache = self.app_handle().state::<WindowStateCache>();
+        let cache = self.state::<WindowStateCache>();
         let cache = cache.0.clone();
         let label = self.label();
 

@@ -52,7 +52,6 @@ fn handle_nemu_event(app: &AppHandle, event: MenuEvent) {
     match event.id.as_ref() {
         "quit" => {
             app.exit(0);
-            println!("exit");
         }
         "setting" => {
             _ = open_setting_window(app);

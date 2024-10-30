@@ -17,13 +17,10 @@ impl EventEmitter {
         let events = self.event.entry(event.to_string()).or_insert(vec![]);
         events.push(Box::new(callback));
 
-        println!("{:?}", self.event.keys())
     }
 
     pub fn emit(&self, event: &str) {
 
-
-        println!("{:?}", self.event.keys());
         let events = self.event.get(event);
 
 
