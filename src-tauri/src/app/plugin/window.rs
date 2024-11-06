@@ -24,7 +24,6 @@ pub fn open_main_window(app: &AppHandle) -> Result<()> {
         .skip_taskbar(true)
         .resizable(false)
         .transparent(true)
-        .shadow(false)
         .always_on_top(true)
         .title("main.window")
 

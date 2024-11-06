@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 
-// mod plugin;
+mod plugin;
 mod app;
 mod library;
 mod util;

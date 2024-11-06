@@ -1,13 +1,18 @@
-use std::{collections::HashMap, path::PathBuf, sync::Arc};
+use std::{
+    collections::HashMap,
+    fs::{read_dir, read_to_string},
+    path::PathBuf,
+    sync::{Arc, Mutex},
+};
 
-use anyhow::Result;
+use anyhow::{Error, Result};
 use libloading::{library_filename, Library};
-use once_cell::sync::OnceCell;
-use parking_lot::Mutex;
 use serde::Deserialize;
-use tokio::fs::{read_dir, read_to_string};
+use tauri::{
+    plugin::{Builder, TauriPlugin}, AppHandle, Manager, RunEvent, Runtime, Wry
+};
 
-
+pub const DEFAULT_FILENAME: &str = ".window-state.json";
 
 /// ##### plugin start state
 ///
@@ -25,98 +30,93 @@ pub enum PluginStartState {
 }
 
 pub struct Plugins {
-    pub plugins: Arc<Mutex<HashMap<String, Plugin>>>,
+    pub plugins: HashMap<String, Plugin>
 }
 
 impl Plugins {
-    pub fn global() -> &'static Self {
-        static INSTANCE: OnceCell<Plugins> = OnceCell::new();
-        INSTANCE.get_or_init(|| Plugins {
-            plugins: Arc::new(Mutex::new(HashMap::new())),
-        })
-    }
-    pub async fn init(&self) -> Result<()> {
-        *self.plugins.as_ref().lock() = Self::get_local_plugins_info().await?;
-        self.plugin_exec();
-
-        println!("{:?}", self.plugins.as_ref().lock());
-        Ok(())
+    pub fn init() -> Self {
+        Self {
+            plugins: HashMap::new(),
+        }
     }
     /// load local plugin info
-    async fn get_local_plugins_info() -> Result<HashMap<String, Plugin>> {
-        let mut plug_path = read_dir("plugins").await?;
+    fn get_local_plugins_info(&mut self) -> Result<()> {
+        log::info!()
+        let mut plug_path: std::fs::ReadDir = read_dir("plugins")?;
+        plug_path.try_for_each(|entry| -> Result<(), Error> {
+            let entry = entry?;
 
-        let mut plugins = HashMap::new();
-        while let Some(entry) = plug_path.next_entry().await? {
-            if !entry.file_type().await?.is_dir() {
-                continue;
+            // 如果不是文件夹
+            if !entry.file_type()?.is_dir() {
+                return Ok(());
             }
 
-            let mut plug_dir = entry.path();
-            plug_dir.push("manifest.json");
-            if !plug_dir.exists() {
-                continue;
+            let mut plugin_dir = entry.path();
+
+            plugin_dir.push("manifest.json");
+
+            // 如果 manifest.json 不存在
+            if !plugin_dir.exists() {
+                return Ok(());
             }
 
-            let manifest = read_to_string(plug_dir).await?;
-
+            let manifest = read_to_string(plugin_dir)?;
             let manifest = serde_json::from_str::<PluginManifest>(&manifest)?;
-
             let plugin = Plugin {
                 path: entry.path(),
                 manifest: manifest.clone(),
                 state: PluginStartState::Normal,
             };
+            self.plugins.insert(manifest.flag.to_string(), plugin);
 
-            plugins.insert(manifest.flag.to_string(), plugin);
+            Ok(())
+        })?;
 
-        }
-
-        Ok(plugins)
+        Ok(())
     }
 
-    fn plugin_exec(&self) {
-        for (_, plugin) in self.plugins.as_ref().lock().iter() {
-            if let Some(err) = self.plugin_load(plugin).err() {
-                println!("{:?}", err);
-            }
-        }
+    fn send(message: String) {
+
     }
 
     fn plugin_load(&self, plugin: &Plugin) -> Result<()> {
         // let lib = self.plugin_lib(plugin);
 
         if PluginStartState::Normal != plugin.state {
-            return Ok(())
+            return Ok(());
         }
 
         // registry plugins hotkey
         if plugin.manifest.shortcut.is_some() {
-            let _ = plugin.manifest.shortcut.as_ref().unwrap().iter().map(|shortcuts| shortcuts.registry());
+            let _ = plugin
+                .manifest
+                .shortcut
+                .as_ref()
+                .unwrap()
+                .iter()
+                .map(|shortcuts| shortcuts.registry());
         }
 
-
-
         Ok(())
-
     }
 
     pub fn plugin_lib(&self, plugin: &Plugin) -> Result<Library> {
         let mut pligin_path = plugin.path.clone();
 
         // set default main file name
-        pligin_path.push(library_filename(plugin.manifest.main.as_ref().unwrap_or(&"plugin".to_string())));
+        pligin_path.push(library_filename(
+            plugin
+                .manifest
+                .main
+                .as_ref()
+                .unwrap_or(&"plugin".to_string()),
+        ));
         unsafe {
             let lib = libloading::Library::new(pligin_path)?;
             Ok(lib)
         }
     }
-
-
-
-
 }
-
 
 #[derive(Debug, Clone)]
 pub struct Plugin {
@@ -124,7 +124,6 @@ pub struct Plugin {
     pub manifest: PluginManifest,
     pub state: PluginStartState,
 }
-
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct PluginManifest {
@@ -142,11 +141,62 @@ pub struct PluginShortcut {
     pub hotkey: String,
 }
 
-
-
 impl PluginShortcut {
-    pub fn registry (&self) -> Result<()>{
+    pub fn registry(&self) -> Result<()> {
         // registry_hotkey(&self.hotkey, &self.command)?;
         Ok(())
     }
+}
+
+
+pub trait AppHandleExt {
+    /// Saves all open windows state to disk
+    fn save_plugins_state(&self) -> Result<()>;
+    fn load_plugins(&self) -> Result<()>;
+}
+
+impl<R: Runtime> AppHandleExt for AppHandle<R> {
+
+    // 保存插件信息到本地
+    fn save_plugins_state(&self) -> Result<()> {
+        Ok(())
+    }
+
+
+    // 加载第三方插件
+    fn load_plugins(&self) -> Result<()> {
+        let cache = self.state::<PluginStateCache>();
+        let mut state = cache.0.lock().unwrap();
+        state.get_local_plugins_info()?;
+        Ok(())
+    }
+}
+
+struct PluginStateCache(Arc<Mutex<Plugins>>);
+pub fn init() -> TauriPlugin<Wry> {
+    Builder::new("core.plugin")
+        .setup(|app, _| {
+
+
+            let plugins = Plugins::init();
+            app.manage(PluginStateCache(Arc::new(Mutex::new(plugins))));
+
+
+
+            Ok(())
+        })
+
+
+
+        .on_event(|app, e| match e {
+
+
+
+            RunEvent::ExitRequested { .. } => {
+                _ = app.save_plugins_state();
+            }
+
+            _ => {}
+        })
+        .build()
 }

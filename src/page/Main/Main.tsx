@@ -60,8 +60,7 @@ function SearchInput(prop: SearchInputProps) {
                 data-tauri-drag-region
                 id="search-input"
                 className="w-full outline-none h-14 text-3xl cursor-default pl-4 bg-transparent placeholder:translate-x-1"
-                placeholder={focused.toString()}
-                // placeholder="Hi, rTools"
+                placeholder="Hi, rTools"
                 type="text"
                 {...prop}
             />

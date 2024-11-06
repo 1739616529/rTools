@@ -2,6 +2,7 @@ use std::error::Error;
 
 use anyhow::Result;
 use tauri::{App, Manager};
+use crate::plugin::AppHandleExt;
 
 use super::plugin::shortcut::{self, registry};
 
@@ -16,7 +17,12 @@ pub fn init(app: &mut App) -> Result<(), Box<dyn Error>> {
 
 
 fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
-    shortcut::setup(app.app_handle());
-    registry(app.app_handle(), "Alt+Space".to_string(), "core:open.main.window".to_string())?;
+
+    let app_handle = app.app_handle();
+    shortcut::setup(app_handle);
+    registry(app_handle, "Alt+Space".to_string(), "core:open.main.window".to_string())?;
+
+    // 加载 第三方插件
+    // app_handle.load_plugins()?;
     Ok(())
 }

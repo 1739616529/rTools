@@ -18,7 +18,6 @@ impl Applican {
 
         let builder = Builder::default()
             .plugin(tauri_plugin_single_instance::init(|_, _, _| {}))
-            .setup(setup::init)
             // 托盘
             .plugin(plugin::tray::init())
             // 快捷键
@@ -31,6 +30,12 @@ impl Applican {
             .plugin(tauri_plugin_log::Builder::new().level(log::LevelFilter::Info).build())
             // 窗口
             .plugin(plugin::window::init())
+
+            // 第三方 plugin
+            .plugin(crate::plugin::init())
+
+
+            .setup(setup::init)
             // .manage(state)
             ;
 
