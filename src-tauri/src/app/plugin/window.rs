@@ -101,7 +101,7 @@ struct WindowState {
     fullscreen: bool,
 }
 
-struct WindowStateCache(Arc<Mutex<HashMap<String, WindowState>>>);
+pub struct WindowStateCache(Arc<Mutex<HashMap<String, WindowState>>>);
 
 impl Default for WindowState {
     fn default() -> Self {

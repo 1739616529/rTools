@@ -12,4 +12,5 @@ pub struct PluginManifest {
     pub description: Option<String>,
     pub shortcut: Option<Vec<PluginShortcut>>,
     pub main: Option<String>,
+    pub permissions: Option<Vec<String>>
 }
