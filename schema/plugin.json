@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "rTools plugin manifest json schema",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "flag": {
+            "type": "string"
+        },
+        "version": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "shortcut": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "command": {
+                        "type": "string"
+                    },
+                    "hotkey": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "command",
+                    "hotkey"
+                ]
+            }
+        },
+        "permissions": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["self-start"]
+            }
+        }
+    },
+    "required": [
+        "name",
+        "flag",
+        "version"
+    ]
+}
