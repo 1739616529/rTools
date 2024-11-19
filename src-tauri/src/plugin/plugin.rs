@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{ffi::{c_char, CString}, path::PathBuf};
 
 use crate::app::plugin::shortcut::registry;
 use anyhow::Result;
@@ -25,7 +25,7 @@ pub enum PluginStartState {
 }
 
 
-type SendEvent = unsafe extern "C" fn(event: &str) -> ();
+type SendEvent = unsafe extern "C" fn(event: *const c_char) -> ();
 
 #[derive(Debug)]
 pub struct Plugin {
@@ -56,7 +56,8 @@ impl Plugin {
         let dyn_lib = &self.dyn_lib;
         let event_fn: Symbol<SendEvent> = unsafe { dyn_lib.get(b"on_event") }?;
         unsafe {
-            event_fn(event);
+            let str = CString::new(event).unwrap();
+            event_fn(str.as_ptr());
         }
         Ok(())
     }

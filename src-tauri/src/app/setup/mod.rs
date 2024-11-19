@@ -20,7 +20,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
 
     let app_handle = app.app_handle();
     shortcut::setup(app_handle);
-    registry(app_handle, "Alt+Space", "core:setup:open.main.window")?;
+    registry(app_handle, "Alt+Space", "core:hotkey:setup:open.main.window")?;
 
     // 加载 第三方插件
     app_handle.load_plugins();
