@@ -1,4 +1,4 @@
-use std::{ffi::{c_char, CString}, path::PathBuf};
+use std::{ffi::{c_char, c_void, CString}, mem, path::PathBuf};
 
 use crate::app::plugin::shortcut::registry;
 use anyhow::Result;
@@ -26,6 +26,7 @@ pub enum PluginStartState {
 
 
 type SendEvent = unsafe extern "C" fn(event: *const c_char) -> ();
+type IpcFunCallback = extern "C" fn(*const c_char);
 
 #[derive(Debug)]
 pub struct Plugin {
@@ -75,7 +76,31 @@ impl Plugin {
                 .iter()
                 .try_for_each(|shortcuts| -> Result<()> { shortcuts.registry(self, app) })?;
         }
+
+
+        self.on_event(app);
+
         Ok(())
+    }
+
+
+    fn event_cb(&self, msg: &str) {
+
+
+        println!("this is dyn lib send msg: {msg}")
+
+    }
+
+    fn on_event(&self, _app: &AppHandle) {
+        if let Ok(event_fn) = unsafe { self.dyn_lib.get::<Symbol<extern "C" fn(extern "C" fn(*const c_char))>>(b"ffi_callback") } {
+            println!("1");
+            let event_cb = |msg: *const c_char| {
+                let msg = unsafe { std::ffi::CStr::from_ptr(msg) };
+                self.event_cb(msg.to_str().unwrap());
+            };
+            event_fn(event_cb);
+            println!("3");
+        };
     }
 }
 
@@ -87,6 +112,7 @@ pub struct PluginShortcut {
 
 impl PluginShortcut {
     pub fn registry(&self, plugin: &Plugin, app: &AppHandle) -> Result<()> {
+
         registry(
             app,
             &self.hotkey,

@@ -83,11 +83,4 @@ pub fn init() -> TauriPlugin<Wry> {
 pub fn setup(app: &AppHandle) {
     let shortcut = Arc::new(Mutex::new(HashMap::<String, String>::new()));
     app.manage(ShortcutStateCache(shortcut));
-    let global_event = app.global_event();
-    let app_handle = app.clone();
-    global_event.on_mulit("registry_hotkey", Box::new(move|msg| {
-        if let Err(err) = registry(&app_handle, msg[0], msg[1]) {
-            log::error!("{}", err)
-        }
-    }));
 }

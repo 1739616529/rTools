@@ -41,7 +41,6 @@ pub fn open_setting_window(app: &AppHandle) -> Result<()> {
     if match_window_to_default(app.get_webview_window(CORE_SETTING_WINDOW))? {
         return Ok(());
     }
-
     let builder =
         WebviewWindowBuilder::new(app, CORE_SETTING_WINDOW, WebviewUrl::App("/setting".into()))
             .visible(true)
