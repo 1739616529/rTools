@@ -1,4 +1,8 @@
 use std::any::Any;
+pub use libloading;
+pub use serde;
+pub use serde_json;
+
 
 
 pub const DEFAULT_PRIORITY: i32 = 100;
@@ -32,5 +36,12 @@ pub trait Plugin: Any + Send + Sync {
     ///     }
     /// }
     /// ```
-    fn priority(&self) -> i32;
+    fn priority(&self) -> i32 {
+        DEFAULT_PRIORITY
+    }
+}
+
+
+pub struct Config {
+    pub name: String
 }
