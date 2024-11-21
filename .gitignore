@@ -32,3 +32,4 @@ target
 /dist\.chrome-extends/
 chrome-extends-api-listen.7z
 plugins
+*-lock.*

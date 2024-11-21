@@ -98,7 +98,7 @@ impl Plugin {
                 let msg = unsafe { std::ffi::CStr::from_ptr(msg) };
                 self.event_cb(msg.to_str().unwrap());
             };
-            event_fn(event_cb);
+            // event_fn(event_cb);
             println!("3");
         };
     }

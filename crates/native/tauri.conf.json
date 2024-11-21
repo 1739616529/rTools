@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.tauri.app/config/2.0.0-rc",
+    "$schema": "https://schema.tauri.app/config/2",
     "productName": "rtools",
     "version": "0.1.0",
     "identifier": "com.rtools.app",
@@ -7,7 +7,7 @@
         "beforeDevCommand": "pnpm dev:ui",
         "devUrl": "http://localhost:1420",
         "beforeBuildCommand": "pnpm build:ui",
-        "frontendDist": "../dist"
+        "frontendDist": "../ui/dist"
     },
 
     "app": {
