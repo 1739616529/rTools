@@ -4,6 +4,8 @@
         "dev": "cd crates/native && cargo tauri dev",
         "build": "cd crates/native && cargo tauri build",
         "dev:ui": "cd crates/ui && pnpm dev",
-        "build:ui": "cd crates/ui && pnpm build"
+        "build:ui": "cd crates/ui && pnpm build",
+        "postinstall": "pnpm install:tauri-cli",
+        "install:tauri-cli": "cargo install tauri-cli --version \"^2.0.0\" --locked"
     }
 }
