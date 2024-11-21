@@ -1,0 +1,8 @@
+[package]
+name = "plugin-screen-craft"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+plugin = { version = "*", path="../plugin"  }
+rtools_macro_plugin = { version = "*", path = "../macro_plugin" }
