@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap, env, fs::{read_dir, read_to_string}, io
+    collections::HashMap, fs::{read_dir, read_to_string}, io
 };
 
 use anyhow::{Error, Result};
@@ -25,8 +25,16 @@ impl Plugins {
             info: Default::default(),
         }
     }
+
+    pub fn load_plugin(&mut self, app: &AppHandle) -> Result<()> {
+        self.get_local_plugins_info(app);
+        self.plugins_registry()?;
+        Ok(())
+    }
+
+
     // 获取本地插件信息
-    pub fn get_local_plugins_info(&mut self, app: &AppHandle) {
+    fn get_local_plugins_info(&mut self, app: &AppHandle) {
         let app_dir = app.path().app_config_dir();
         if app_dir.is_err() {
             self.info = Default::default();
@@ -107,14 +115,14 @@ impl Plugins {
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct PluginsInfo {
     pub state: PluginStartState,
-    pub flag: String,
+    pub name: &'static str,
 }
 
 impl Default for PluginsInfo {
     fn default() -> Self {
         Self {
-            state: PluginStartState::Normal,
-            flag: "".to_string(),
+            state: Default::default(),
+            name: Default::default(),
         }
     }
 }

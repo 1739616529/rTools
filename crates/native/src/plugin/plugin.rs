@@ -25,6 +25,12 @@ pub enum PluginStartState {
 }
 
 
+impl Default for PluginStartState {
+    fn default() -> Self {
+        Self::Normal
+    }
+}
+
 type SendEvent = unsafe extern "C" fn(event: *const c_char) -> ();
 type IpcFunCallback = extern "C" fn(*const c_char);
 

@@ -30,7 +30,6 @@ impl AppHandleExt for AppHandle {
         let cache = self.state::<PluginStateCache>();
         let mut state = cache.0.lock().unwrap();
         let app = self.app_handle();
-        state.get_local_plugins_info(app);
         if let Err(err) = state.load_local_plugins(app) {
             log::error!("{}", err);
         }
