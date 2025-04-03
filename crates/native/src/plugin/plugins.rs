@@ -115,7 +115,7 @@ impl Plugins {
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub struct PluginsInfo {
     pub state: PluginStartState,
-    pub name: &'static str,
+    pub name: String,
 }
 
 impl Default for PluginsInfo {
